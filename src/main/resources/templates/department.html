@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Tin Phòng Ban</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        th:first-child, td:first-child {
+            width: 50px; /* Điều chỉnh độ rộng nếu cần */
+        }
+        /* Kiểu dáng cho modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            -top: 60px;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 40%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover{
+            text-decoration: none;
+            cursor: pointer;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="submit"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #888;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #888;
+        }
+        /* Kiểu dáng cho thanh tìm kiếm */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .search-container input[type="text"] {
+            width: 300px;
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .search-container input[type="text"]:focus {
+            border-color: #888;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            outline: none;
+        }
+        /* Cách bảng 10px */
+        #addDepartmentBtn {
+            margin-bottom: 10px;
+        }
+        button svg {
+            fill: #000; /* Change the color */
+            width: 24px;
+            height: 24px;
+        }
+        button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>Thông Tin Phòng Ban</h1>
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Tìm kiếm...">
+</div>
+<button id="addDepartmentBtn">Thêm Phòng Ban</button>
+<table id="departmentTable">
+    <thead>
+    <tr>
+        <th>STT</th>
+        <th>Tên Phòng Ban</th>
+        <th>Tên Nhân Viên</th>
+        <th>Vai Trò</th>
+        <th>Hành Động</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Dữ liệu sẽ được chèn vào đây bằng JavaScript -->
+    </tbody>
+</table>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle">Thêm Phòng Ban Mới</h2>
+        <form id="addDepartmentForm">
+            <label for="departmentName">Tên Phòng Ban:</label>
+            <input type="text" id="departmentName" name="departmentName">
+            <span id="departmentError" style="color: red;"></span>
+            <label for="userName">Tên Nhân Viên:</label>
+            <input type="text" id="userName" name="userName">
+            <span id="userError" style="color: red;"></span>
+            <label for="roleName">Vai Trò:</label>
+            <input type="text" id="roleName" name="roleName">
+            <input type="submit" value="Thêm Phòng Ban">
+        </form>
+    </div>
+</div>
+
+<script>
+    let editDepartmentId = null;
+
+    // Hàm để điền dữ liệu vào bảng
+    function populateTable(data) {
+        const tableBody = document.getElementById('departmentTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = ''; // Xóa dữ liệu cũ
+        data.forEach((department, index) => {
+            const row = tableBody.insertRow();
+            row.dataset.id = department.departmentId; // Lưu ID phòng ban vào thuộc tính dataset
+            row.insertCell(0).textContent = index + 1; // Số thứ tự
+            row.insertCell(1).textContent = department.departmentName;
+            row.insertCell(2).textContent = department.userName;
+            row.insertCell(3).textContent = department.roleName;
+            const actionCell = row.insertCell(4);
+            actionCell.innerHTML = `
+              <button onclick="editDepartment(${department.departmentId}, '${department.departmentName}', '${department.userName}', '${department.roleName}')">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><g id="Layer_12" data-name="Layer 12"><path d="M49.28,27.25a1.5,1.5,0,0,0-1.5,1.5V46a1.32,1.32,0,0,1-1.32,1.32H18A1.32,1.32,0,0,1,16.69,46V17.54A1.32,1.32,0,0,1,18,16.22H35.24a1.5,1.5,0,0,0,0-3H18a4.33,4.33,0,0,0-4.32,4.32V46A4.33,4.33,0,0,0,18,50.31H46.46A4.33,4.33,0,0,0,50.78,46V28.75A1.5,1.5,0,0,0,49.28,27.25Z"></path><path d="M51.68,12.32a6.23,6.23,0,0,0-8.79,0L31.56,23.65a1.49,1.49,0,0,0-.36.59l-3.31,10a1.5,1.5,0,0,0,1.89,1.89l10-3.31a1.49,1.49,0,0,0,.59-.36L51.68,21.11A6.23,6.23,0,0,0,51.68,12.32ZM38.48,30.07l-6.81,2.26,2.26-6.81,8.16-8.15,4.54,4.54ZM49.56,19l-.81.8-4.54-4.54.8-.81A3.22,3.22,0,0,1,49.56,19Z"></path></g></svg>
+              </button>
+              <button onclick="deleteDepartment(${department.departmentId})">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M11 2C10.4477 2 10 2.44772 10 3V4H14V3C14 2.44772 13.5523 2 13 2H11ZM16 4V3C16 1.34315 14.6569 0 13 0H11C9.34315 0 8 1.34315 8 3V4H3C2.44772 4 2 4.44772 2 5C2 5.55228 2.44772 6 3 6H3.10496L4.80843 21.3313C4.97725 22.8506 6.26144 24 7.79009 24H16.2099C17.7386 24 19.0228 22.8506 19.1916 21.3313L20.895 6H21C21.5523 6 22 5.55228 22 5C22 4.44772 21.5523 4 21 4H16ZM18.8827 6H5.11726L6.7962 21.1104C6.85247 21.6169 7.28054 22 7.79009 22H16.2099C16.7195 22 17.1475 21.6169 17.2038 21.1104L18.8827 6ZM10 9C10.5523 9 11 9.44771 11 10V18C11 18.5523 10.5523 19 10 19C9.44772 19 9 18.5523 9 18V10C9 9.44771 9.44772 9 10 9ZM14 9C14.5523 9 15 9.44771 15 10V18C15 18.5523 14.5523 19 14 19C13.4477 19 13 18.5523 13 18V10C13 9.44771 13.4477 9 14 9Z" fill="#293644"></path>
+</svg>
+              </button>
+            `;
+        });
+    }
+
+    // Lấy dữ liệu từ API backend
+    async function fetchData() {
+        try {
+            const response = await fetch('/api/v1/departments/all'); // Điều chỉnh URL để phù hợp với API backend
+            const data = await response.json();
+            populateTable(data);
+        } catch (error) {
+            console.error('Lỗi khi lấy dữ liệu:', error);
+        }
+    }
+
+    // Mở modal để thêm mới phòng ban
+    function addDepartment() {
+        editDepartmentId = null;
+        document.getElementById('modalTitle').textContent = 'Thêm Phòng Ban Mới';
+        document.getElementById('departmentName').value = '';
+        document.getElementById('userName').value = '';
+        document.getElementById('roleName').value = '';
+        document.getElementById('addDepartmentForm').querySelector('input[type="submit"]').value = 'Thêm Phòng Ban';
+        document.getElementById('myModal').style.display = 'block';
+    }
+
+    // Mở modal để chỉnh sửa phòng ban
+    function editDepartment(id, departmentName, userName, roleName) {
+        editDepartmentId = id; // Lưu ID để dùng khi cập nhật
+        document.getElementById('modalTitle').textContent = 'Sửa Phòng Ban';
+        document.getElementById('departmentName').value = departmentName;
+        document.getElementById('userName').value = userName;
+        document.getElementById('roleName').value = roleName;
+        document.getElementById('addDepartmentForm').querySelector('input[type="submit"]').value = 'Cập Nhật Phòng Ban';
+        document.getElementById('myModal').style.display = 'block';
+    }
+
+    // Đóng modal
+    function closeModal() {
+        document.getElementById('myModal').style.display = 'none';
+    }
+
+    // Gửi dữ liệu lên backend để tạo hoặc cập nhật phòng ban
+    async function submitDepartment(event) {
+        event.preventDefault();
+        const departmentNameInput = document.getElementById('departmentName');
+        const userNameInput = document.getElementById('userName');
+        const roleNameInput = document.getElementById('roleName');
+        const departmentName = departmentNameInput.value.trim();
+        const userName = userNameInput.value.trim();
+        const roleName = roleNameInput.value.trim();
+        const departmentData = { departmentName, userName, roleName };
+        // Clear previous error messages
+        document.getElementById('departmentError').textContent = '';
+        document.getElementById('userError').textContent = '';
+        try {
+            let response;
+            if (editDepartmentId) {
+                response = await fetch(`/api/v1/departments/${editDepartmentId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(departmentData)
+                });
+            } else {
+                response = await fetch('/api/v1/departments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(departmentData)
+                });
+            }
+            const result = await response.json();
+            if (!response.ok) {
+                if (result.message.includes('Department name already exists')) {
+                    document.getElementById('departmentError').textContent = 'Tên phòng ban đã tồn tại!';
+                } else if (result.message.includes('Username already exists in this department')) {
+                    document.getElementById('userError').textContent = 'Nhân viên này đã có trong phòng ban!';
+                }
+                throw new Error(result.message);
+            }
+            fetchData(); // Refresh the department list
+            closeModal();
+        } catch (error) {
+            console.error('Lỗi:', error);
+        }
+    }
+
+    // Gửi yêu cầu xóa phòng ban
+    async function deleteDepartment(id) {
+        if (!confirm('Bạn có chắc muốn xóa phòng ban này?')) return;
+        try {
+            const response = await fetch(`/api/v1/departments/${id}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) throw new Error('Lỗi khi xóa phòng ban');
+            fetchData(); // Cập nhật lại bảng sau khi xóa
+        } catch (error) {
+            console.error('Lỗi:', error);
+        }
+    }
+
+    // Tìm kiếm trong bảng
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        const filter = this.value.toLowerCase();
+        const rows = document.getElementById('departmentTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        Array.from(rows).forEach(row => {
+            const cells = row.getElementsByTagName('td');
+            const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
+            row.style.display = match ? '' : 'none';
+        });
+    });
+
+    // Đóng modal khi nhấn vào dấu "X"
+    document.getElementsByClassName('close')[0].onclick = function () {
+        closeModal();
+    };
+
+    // Đóng modal khi nhấn bên ngoài modal
+    window.onclick = function (event) {
+        const modal = document.getElementById('myModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    };
+
+    // Gán sự kiện cho form và nút thêm mới
+    document.getElementById('addDepartmentForm').addEventListener('submit', submitDepartment);
+    document.getElementById('addDepartmentBtn').addEventListener('click', addDepartment);
+
+    // Tải dữ liệu khi trang load
+    document.addEventListener('DOMContentLoaded', fetchData);
+</script>
+</body>
+</html>

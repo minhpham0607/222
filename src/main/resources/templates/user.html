@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      border: 2px solid #000;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-sizing: border-box;
+    }
+    .logout-button {
+      display: flex;
+      margin-left: auto;
+      font-size: 14px; /* Chỉnh chữ nhỏ hơn */
+      border: none; /* Xóa viền */
+      background: none; /* Xóa nền */
+    }
+    .logout-button i {
+      font-size: 24px; /* Giữ kích thước icon */
+    }
+    .logout-button span {
+      margin-top: 5px; /* Tạo khoảng cách giữa icon và chữ */
+    }
+    .content-wrapper {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .tabs {
+      display: flex;
+      margin-top: 40px;
+      width: 33%;
+      margin-left: 20px;
+      border-bottom: none; /* Xóa viền dưới */
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+      border: none; /* Xóa viền */
+      background: #f2f2f2; /* Màu nền nhẹ */
+    }
+    .tab.active {
+      background-color: #ddd;
+      font-weight: bold;
+      position: relative;
+      z-index: 2;
+      clip-path: polygon(0 0, 90% 0, 100% 100%, 0 100%);
+      margin-right: -23px;
+    }
+    .content {
+      display: none;
+      padding: 15px;
+      border: 1px solid #ddd;
+      flex-grow: 1;
+    }
+    .content.active {
+      display: block;
+    }
+    .request-container {
+      padding: 15px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border: none; /* Xóa viền */
+      background: none; /* Xóa nền */
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 40px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .toolbar .search-bar {
+      flex-grow: 1;
+      max-width: 350px;
+      max-height: 100px;
+    }
+    .toolbar .reset-button {
+      margin-left: auto;
+    }
+    .toolbar .add-new-button {
+      margin-left: auto; /* Move to the right */
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      flex-grow: 1;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+    }
+
+    // Hàm để điền dữ liệu vào bảng
+    function populateTable(data) {
+      const tableBody = document.getElementById('accountsTableBody');
+      tableBody.innerHTML = ''; // Xóa nội dung cũ
+      data.forEach(account => {
+        const row = tableBody.insertRow();
+        row.insertCell(0).textContent = account.username;
+        row.insertCell(1).textContent = account.email; // Thêm cột email
+        row.insertCell(2).textContent = account.role;
+        row.insertCell(3).textContent = account.department;
+        row.insertCell(4).textContent = account.status;
+        const editCell = row.insertCell(5);
+        editCell.style.textAlign = 'center';
+        const editButton = document.createElement('button');
+        editButton.innerHTML = '<i class="fas fa-edit"></i>';
+        editButton.onclick = () => editAccount(account.username);
+        editCell.appendChild(editButton);
+      });
+    }
+
+    // Hàm để lấy dữ liệu từ API backend
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/v1/users/all'); // Điều chỉnh URL để khớp với endpoint API của bạn
+        const data = await response.json();
+        populateTable(data);
+      } catch (error) {
+        console.error('Lỗi khi lấy dữ liệu:', error);
+      }
+    }
+
+    // Hàm để tìm kiếm tài khoản
+    async function searchAccount() {
+      const username = document.getElementById('keyword').value;
+      try {
+        const response = await fetch(`/api/v1/users/getUserByUsername/${username}`);
+        const data = await response.json();
+        populateTable([data]); // Chuyển đổi thành mảng để sử dụng lại hàm populateTable
+      } catch (error) {
+        console.error('Lỗi khi tìm kiếm:', error);
+      }
+    }
+
+    // Điền dữ liệu vào bảng khi trang được tải
+    document.addEventListener('DOMContentLoaded', fetchData);
+
+    function editAccount(username) {
+      alert('Chỉnh sửa tài khoản: ' + username);
+    }
+
+    function resetForm() {
+      document.getElementById('departments').value = '';
+      document.getElementById('roles').value = '';
+      document.getElementById('keyword').value = '';
+      fetchData(); // Gọi lại hàm fetchData để hiển thị tất cả người dùng
+    }
+
+    function resetFilters() {
+      alert('Thêm mới tài khoản');
+    }
+  </script>
+</head>
+<body onload="showTab('manage-accounts')">
+<div class="container">
+  <button class="logout-button" onclick="alert('Đăng xuất!')">
+    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+  </button>
+  <div class="content-wrapper">
+    <div class="tabs">
+      <div class="tab" onclick="showTab('manage-requests')">Quản lý yêu cầu</div>
+      <div class="tab active" onclick="showTab('manage-accounts')">Quản lý tài khoản</div>
+    </div>
+    <div id="manage-accounts" class="content active">
+      <div class="request-container">
+        <div class="toolbar">
+          <label for="departments">Đơn vị</label>
+          <select id="departments">
+          </select>
+          <label for="roles">Quyền</label>
+          <select id="roles">
+          </select>
+          <input type="text" id="keyword" class="search-bar" placeholder="Tìm kiếm theo tên, username, email">
+          <button onclick="searchAccount()">
+            <i class="fas fa-search"></i>
+          </button>
+          <button type="button" onclick="resetForm()">
+            <i class="fas fa-undo"></i>
+          </button>
+          <button id="addNewButton" class="add-new-button" onclick="resetFilters()">Thêm mới</button>
+        </div>
+        <table>
+          <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th> <!-- Thêm cột email -->
+            <th>Role</th>
+            <th>Đơn vị</th>
+            <th>Tình trạng</th>
+            <th>Chỉnh sửa</th>
+          </tr>
+          </thead>
+          <tbody id="accountsTableBody">
+          <!-- Dữ liệu sẽ được chèn vào đây bởi JavaScript -->
+          </tbody>
+        </table>
+        <nav>
+          <ul class="pagination" id="pagination">
+            <!-- Các mục phân trang sẽ được chèn vào đây bởi JavaScript -->
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <div id="manage-requests" class="content">
+      <div class="request-container">
+        <h3>Quản lý yêu cầu</h3>
+        <p>Chức năng quản lý yêu cầu sẽ được thêm sau.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

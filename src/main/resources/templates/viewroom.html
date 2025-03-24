@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Room</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .btn {
+            margin-right: 5px;
+            border-radius: 20px;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        h2 {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: #ff69b4;
+        }
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .table th {
+            background-color: #ff69b4;
+            color: white;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #ffe4e1;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">Bookings</h2>
+    <table class="table table-bordered table-hover">
+        <thead>
+        <tr>
+            <th>Booking ID</th>
+            <th>Username</th>
+            <th>Room ID</th>
+            <th>Title</th>
+            <th>Attendees</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="booking : ${bookings}" onclick="fetchBookingDetails('${booking.bookingId}')">
+            <td th:text="${booking.bookingId}"></td>
+            <td th:text="${booking.username}"></td>
+            <td th:text="${booking.roomId}"></td>
+            <td th:text="${booking.title}"></td>
+            <td th:text="${booking.attendees}"></td>
+            <td th:text="${booking.startTime}"></td>
+            <td th:text="${booking.endTime}"></td>
+            <td>
+                <button class="btn btn-primary btn-sm" onclick="openEditForm('${booking.bookingId}')">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="openDeletePopup('${booking.bookingId}')">Delete</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-success" onclick="window.location.href='Bookings.html'">Create Booking</button>
+</div>
+
+<!-- Booking Details Modal -->
+<div class="modal fade" id="bookingDetailsModal" tabindex="-1" role="dialog" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingDetailsModalLabel">Booking Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Booking ID:</strong> <span id="modalBookingId"></span></p>
+                <p><strong>Username:</strong> <span id="modalUsername"></span></p>
+                <p><strong>Room ID:</strong> <span id="modalRoomId"></span></p>
+                <p><strong>Title:</strong> <span id="modalTitle"></span></p>
+                <p><strong>Attendees:</strong> <span id="modalAttendees"></span></p>
+                <p><strong>Start Time:</strong> <span id="modalStartTime"></span></p>
+                <p><strong>End Time:</strong> <span id="modalEndTime"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    function openDeletePopup(bookingId) {
+        const popupUrl = 'popup.html?bookingId=' + bookingId;
+        window.open(popupUrl, 'Delete Booking', 'width=400,height=300');
+    }
+    function openEditForm(bookingId) {
+        const editUrl = 'bookingedit.html?bookingId=' + bookingId;
+        window.location.href = editUrl;
+    }
+    function fetchBookingDetails(bookingId) {
+        $.ajax({
+            type: 'GET',
+            data: { bookingId: bookingId },
+            success: function(response) {
+                const booking = JSON.parse(response);
+                $('#modalBookingId').text(booking.bookingId);
+                $('#modalUsername').text(booking.username);
+                $('#modalRoomId').text(booking.roomId);
+                $('#modalTitle').text(booking.title);
+                $('#modalAttendees').text(booking.attendees);
+                $('#modalStartTime').text(booking.startTime);
+                $('#modalEndTime').text(booking.endTime);
+                $('#bookingDetailsModal').modal('show');
+            },
+            error: function(error) {
+                console.error('Error fetching booking details:', error);
+            }
+        });
+    }
+</script>
+</body>
+</html>

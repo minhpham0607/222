@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>CMC Global Meeting</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Nunito+Sans:200,300,400,600,700,800,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/open-iconic-bootstrap.min.css">
+    <link rel="stylesheet" href="/css/animate.css">
+    <link rel="stylesheet" href="/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="/css/magnific-popup.css">
+    <link rel="stylesheet" href="/css/aos.css">
+    <link rel="stylesheet" href="/css/ionicons.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="/css/jquery.timepicker.css">
+    <link rel="stylesheet" href="/css/flaticon.css">
+    <link rel="stylesheet" href="/css/icomoon.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #f5f6fa;
+            --border-color: #e0e0e0;
+            --text-color: #333;
+            --time-slot-height: 15px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+        }
+
+        .topnav {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-right: 20px;
+        }
+
+        .menu-item {
+            text-decoration: none;
+            color: var(--text-color);
+            margin: 0 15px;
+            font-weight: 500;
+        }
+
+        .menu-item.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .user-profile {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+        }
+
+        .filter-bar {
+            display: flex;
+            padding: 15px 0;
+            background-color: var(--secondary-color);
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+            padding-left: 60px; /* Align with the room cards */
+        }
+
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            font-weight: 500;
+        }
+
+        .btn-filter {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-reset {
+            background-color: white;
+            border: 1px solid var(--border-color);
+        }
+
+        .room-list {
+            display: flex;
+            padding: 15px 0;
+            overflow-x: hidden; /* Hide overflow and use navigation */
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            scroll-behavior: smooth; /* Smooth scrolling */
+            width: 100%;
+        }
+
+        .room-card {
+            border-radius: 4px;
+            width: 24%; /* Fixed width to match grid column */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-right: 15px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 0 0 auto; /* Don't grow or shrink */
+            position: relative;
+        }
+
+        /* First room card needs margin-left */
+        .room-list .room-card:first-child {
+            margin-left: 60px; /* Match the width of time column */
+        }
+
+        .room-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .room-tooltip {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 250px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            font-size: 0.9em;
+        }
+
+        .room-card:hover .room-tooltip {
+            display: block;
+        }
+
+        .tooltip-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .tooltip-info {
+            margin-bottom: 3px;
+        }
+
+        .room-name {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .room-info {
+            color: #666;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .schedule-container {
+            display: flex;
+            position: relative;
+            overflow-x: auto;
+            margin: 0;
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            scroll-behavior: smooth; /* Smooth scrolling */
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .time-column {
+            min-width: 60px;
+            border-right: 1px solid var(--border-color);
+            background-color: var(--secondary-color);
+        }
+
+        .time-slot {
+            height: 60px; /* 15px * 4 = 60px per hour */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.85em;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .room-column {
+            flex: 0 0 25%; /* Fixed width to match room card */
+            width: 25%;
+            border-right: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .event-grid {
+            position: relative;
+            height: 100%;
+        }
+
+        .time-cell {
+            height: 15px;
+            border-bottom: 1px dashed #e0e0e0;
+            position: relative;
+        }
+
+        .time-cell.hour-marker {
+            border-bottom: 1px solid #c0c0c0;
+        }
+
+        .meeting-event {
+            position: absolute;
+            left: 5px;
+            right: 5px;
+            background-color: rgba(0, 123, 255, 0.8);
+            color: white;
+            border-radius: 4px;
+            padding: 5px;
+            font-size: 0.85em;
+            cursor: pointer;
+            overflow: hidden;
+            z-index: 5;
+        }
+
+        .meeting-title {
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .meeting-organizer {
+            font-size: 0.85em;
+            margin-top: 2px;
+        }
+
+        .meeting-description {
+            margin-top: 4px;
+            font-size: 0.8em;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .meeting-tooltip {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px;
+            width: 220px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 1010;
+            color: var(--text-color);
+            font-size: 0.9em;
+        }
+
+        .meeting-event:hover .meeting-tooltip {
+            display: block;
+            left: 100%;
+            top: 0;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 180px; /* Position at the room list level */
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 100;
+        }
+
+        .nav-left {
+            left: 10px;
+        }
+
+        .nav-right {
+            right: 10px;
+        }
+
+        .selected-room {
+            background-color: #e6f2ff;
+            border: 2px solid var(--primary-color);
+        }
+
+        /* Draggable event styles */
+        .meeting-event.draggable {
+            cursor: move;
+        }
+
+        .meeting-event.dragging {
+            opacity: 0.7;
+            z-index: 100;
+        }
+
+        .resizer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            cursor: ns-resize;
+        }
+
+        /* Add event hover */
+        .time-cell:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        footer {
+            padding: 15px 0;
+            text-align: center;
+            background-color: var(--secondary-color);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+    <div class="container">
+        <a class="navbar-brand" href="index.html">Meeting</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="oi oi-menu"></span> Menu
+        </button>
+        <div class="collapse navbar-collapse" id="ftco-nav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active"><a href="index.html" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Office</a></li>
+                <li class="nav-item"><a href="bookings.html" class="nav-link">Meeting</a></li>
+                <li class="nav-item cta mr-md-2"><a href="#" class="nav-link">Account</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Top Navigation -->
+<div class="topnav">
+    <div class="logo">
+        <i class="fas fa-cloud"></i>
+    </div>
+    <a href="#" class="menu-item">OFFICE</a>
+    <a href="#" class="menu-item active">MEETING</a>
+    <div class="user-profile">
+        <span>Hey, A </span>
+        <div class="avatar">A</div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="container-fluid px-0">
+    <div class="filter-bar">
+        <input type="date" class="filter-input date-input" value="2024-10-15">
+        <!-- Start Time -->
+        <input type="datetime-local" id="startTime" class="filter-input time-input" name="startTime" placeholder="Start time">
+        <!-- End Time -->
+        <input type="datetime-local" id="endTime" class="filter-input time-input" name="endTime" placeholder="End time">
+        <select class="filter-input duration-input">
+            <option>Duration</option>
+            <option>15'</option>
+            <option>30'</option>
+            <option>1h</option>
+            <option>2h</option>
+        </select>
+        <select class="filter-input seats-input">
+            <option>Capacity</option>
+            <option>4 seats</option>
+            <option>6 seats</option>
+            <option>8 seats</option>
+            <option>12 seats</option>
+        </select>
+        <select class="filter-input location-input">
+            <option>789 tower</option>
+        </select>
+        <input type="text" class="filter-input search-input" placeholder="Search by room name">
+        <button class="btn btn-filter">Filter</button>
+        <button class="btn btn-reset">Reset</button>
+    </div>
+</div>
+
+<!-- Room List -->
+<div class="container-fluid px-0">
+    <div class="room-list" id="roomList">
+        <!-- div class="room-card selected-room" data-room="ha-noi">
+            <div class="room-header">
+                <h4 class="room-name">Hà Nội</h4>
+                <div class="room-info">
+                    <span>789 tower</span>
+                </div>
+                <div class="room-info">
+                    <span>1 VNĐh - 12 seats</span>
+                </div>
+            </div>
+        </div>
+        <div class="room-card" data-room="ho-chi-minh">
+            <div class="room-header">
+                <h4 class="room-name">Hồ Chí Minh</h4>
+                <div class="room-info">
+                    <span>789 tower</span>
+                </div>
+                <div class="room-info">
+                    <span>1 VNĐh - 12 seats</span>
+                </div>
+            </div>
+        </div>
+        <div class="room-card" data-room="da-nang">
+            <div class="room-header">
+                <h4 class="room-name">Đà Nẵng</h4>
+                <div class="room-info">
+                    <span>789 tower</span>
+                </div>
+                <div class="room-info">
+                    <span>1 VNĐh - 4 seats</span>
+                </div>
+            </div>
+        </div>
+        <div class="room-card" data-room="booth-tokyo">
+            <div class="room-header">
+                <h4 class="room-name">Booth Tokyo</h4>
+                <div class="room-info">
+                    <span>789 tower</span>
+                </div>
+                <div class="room-info">
+                    <span>1 VNĐh - 1 seats</span>
+                </div>
+            </div>
+        </div -->
+    </div>
+</div>
+
+<!-- Schedule Grid -->
+<div class="container-fluid px-0">
+    <div class="schedule-container">
+        <!-- Time Column -->
+        <div class="time-column" id="timeColumn">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Grid -->
+        <div class="grid-container" id="gridContainer">
+            <!-- Will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Arrows - Moved outside schedule container for better positioning -->
+<div class="nav-arrow nav-left">
+    <i class="fas fa-chevron-left"></i>
+</div>
+<div class="nav-arrow nav-right">
+    <i class="fas fa-chevron-right"></i>
+</div>
+
+<footer class="container-fluid">
+    <p>&copy; 2025 Meeting Room Reservation System</p>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/jquery-migrate-3.0.1.min.js"></script>
+<script src="/js/popper.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.easing.1.3.js"></script>
+<script src="/js/jquery.waypoints.min.js"></script>
+<script src="/js/jquery.stellar.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/jquery.magnific-popup.min.js"></script>
+<script src="/js/aos.js"></script>
+<script src="/js/jquery.animateNumber.min.js"></script>
+<script src="/js/scrollax.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+<script src="/js/google-map.js"></script>
+<script src="/js/main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // API URL
+        const API_URL = 'http://localhost:8080/api/v1/meeting-room';
+
+        // Current date for default filtering
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        $('.date-input').val(formattedDate);
+
+        // Store meeting data
+        let meetingData = [];
+
+        // Initial data fetch
+        fetchMeetingRooms();
+
+        // Fetch meeting rooms from API
+        function fetchMeetingRooms(filters = {}) {
+            // Show loading indicator if needed
+            // $('.loading-indicator').show();
+
+            // Build query parameters for API call
+            let queryParams = new URLSearchParams();
+
+            // Add filters to query
+            if (filters.date) queryParams.append('date', filters.date);
+            if (filters.startTime) queryParams.append('startTime', filters.startTime);
+            if (filters.endTime) queryParams.append('endTime', filters.endTime);
+            if (filters.duration) queryParams.append('duration', filters.duration);
+            if (filters.capacity) queryParams.append('capacity', filters.capacity);
+            if (filters.location) queryParams.append('location', filters.location);
+            if (filters.roomName) queryParams.append('roomName', filters.roomName);
+
+            // Build URL with query parameters
+            const url = `${API_URL}?${queryParams.toString()}`;
+
+            // Fetch data from API
+            // For testing, use mock data
+            // In production, use $.ajax or fetch to call the actual API
+
+            // Simulating API call for demonstration
+            setTimeout(() => {
+                // For production, use:
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function(response) {
+                        processApiResponse(response);
+                    },
+                    error: function(error) {
+                        console.error('Error fetching meeting rooms:', error);
+                    },
+                    complete: function() {
+                        $('.loading-indicator').hide();
+                    }
+                });
+
+                // Hide loading indicator
+                $('.loading-indicator').hide();
+            }, 500);
+        }
+
+        // Process API response and update UI
+        function processApiResponse(response) {
+            if (response.status === 'success') {
+                // Clear existing meeting data
+                meetingData = [];
+
+                // Process and store all rooms from API first
+                const allRooms = [];
+                const roomMap = {};
+
+                // Extract unique rooms from the API response
+                response.data.forEach(item => {
+                    if (!roomMap[item.roomId]) {
+                        roomMap[item.roomId] = true;
+                        allRooms.push({
+                            roomId: item.roomId,
+                            roomName: item.roomName,
+                            location: item.location || '789 tower', // Default location if not provided
+                            capacity: item.capacity || 4, // Default capacity if not provided
+                            room: `room-${item.roomId}`
+                        });
+                    }
+                });
+
+                // Store the meeting data
+                response.data.forEach(item => {
+                    // Parse dates
+                    const startDateTime = new Date(item.startTime);
+                    const endDateTime = new Date(item.endTime);
+
+                    // Calculate duration in minutes
+                    const durationMs = endDateTime - startDateTime;
+                    const durationMinutes = Math.floor(durationMs / (1000 * 60));
+
+                    // Format time for display
+                    const startHour = startDateTime.getHours();
+                    const startMinute = startDateTime.getMinutes();
+                    const formattedStartTime = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+
+                    // Create room ID for internal use
+                    const roomIdFormatted = `room-${item.roomId}`;
+
+                    // Get the corresponding room from our allRooms array
+                    const room = allRooms.find(r => r.roomId === item.roomId);
+
+                    meetingData.push({
+                        room: roomIdFormatted,
+                        roomId: item.roomId,
+                        roomName: item.roomName,
+                        location: item.location || (room ? room.location : '789 tower'),
+                        capacity: item.capacity || (room ? room.capacity : 4),
+                        title: `${item.roomName} - ${item.username}`,
+                        organizer: item.username,
+                        description: `Status: ${item.status}`,
+                        startTime: formattedStartTime,
+                        duration: durationMinutes,
+                        status: item.status,
+                        startDateTime: startDateTime,
+                        endDateTime: endDateTime
+                    });
+                });
+
+                // Update room list with all rooms from API
+                updateRoomList(allRooms);
+
+                // Generate grid
+                generateTimeColumn();
+                generateRoomGrid();
+
+            } else {
+                console.error('API returned error:', response.retMsg);
+                // Show error message to user if needed
+            }
+        }
+
+        // Update room list based on API data
+        function updateRoomList(allRooms) {
+            const roomList = $('#roomList');
+            roomList.empty();
+
+            // If allRooms parameter is not provided, extract from meetingData
+            if (!allRooms) {
+                allRooms = [];
+                const roomMap = {};
+
+                meetingData.forEach(meeting => {
+                    if (!roomMap[meeting.roomId]) {
+                        roomMap[meeting.roomId] = true;
+                        allRooms.push({
+                            roomId: meeting.roomId,
+                            roomName: meeting.roomName,
+                            location: meeting.location,
+                            capacity: meeting.capacity,
+                            room: meeting.room
+                        });
+                    }
+                });
+            }
+
+            // Add rooms to the list
+            allRooms.forEach((room, index) => {
+                const isSelected = index === 0 ? 'selected-room' : '';
+                const extraInfo = room.username ? `<div class="tooltip-info"><strong>Chủ phòng:</strong> ${room.username}</div>` : '';
+
+                const roomCard = $(`
+                      <div class="room-card ${isSelected}" data-room="${room.room}">
+                        <div class="room-header">
+                          <h4 class="room-name">${room.roomName}</h4>
+                          <div class="room-info">
+                            <span>${room.location}</span>
+                          </div>
+                          <div class="room-info">
+                            <span>${room.capacity} seats</span>
+                          </div>
+                        </div>
+                      </div>
+                    `);
+
+                roomList.append(roomCard);
+            });
+
+            // If no rooms, show a message
+            if (allRooms.length === 0) {
+                roomList.append('<div class="no-rooms">No rooms available for the selected criteria.</div>');
+            }
+
+            // Bind click event to room cards
+            $('.room-card').on('click', function() {
+                const roomIndex = $(this).index();
+                currentRoomIndex = roomIndex;
+                updateRoomScrollPosition();
+            });
+        }
+
+        // Generate time slots (8:00 - 18:00)
+        const startHour = 8;
+        const endHour = 18;
+
+        // Generate time column
+        function generateTimeColumn() {
+            const timeColumn = $('#timeColumn');
+            timeColumn.empty();
+
+            for (let hour = startHour; hour <= endHour; hour++) {
+                const formattedHour = hour.toString().padStart(2, '0') + ':00';
+                timeColumn.append(`<div class="time-slot">${formattedHour}</div>`);
+            }
+        }
+
+        // Check if time is past
+        function isPastTime(hour, minute) {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+
+            if (currentHour > hour) {
+                return true;
+            } else if (currentHour === hour && currentMinute > minute) {
+                return true;
+            }
+
+            return false;
+        }
+
+        // Generate grid for each room
+        function generateRoomGrid() {
+            const gridContainer = $('#gridContainer');
+            gridContainer.empty();
+
+            // Get all room ids from meeting data
+            const uniqueRoomIds = [...new Set(meetingData.map(meeting => meeting.room))];
+
+            // If no rooms, show a message
+            if (uniqueRoomIds.length === 0) {
+                gridContainer.append('<div class="no-rooms">No rooms available for the selected criteria.</div>');
+                return;
+            }
+
+            // Create a column for each room
+            uniqueRoomIds.forEach(roomId => {
+                const roomColumn = $(`<div class="room-column" data-room="${roomId}"></div>`);
+                const eventGrid = $(`<div class="event-grid"></div>`);
+
+                // Create time cells (15 min intervals) for 8:00 - 18:00
+                for (let hour = startHour; hour <= endHour; hour++) {
+                    for (let minute = 0; minute < 60; minute += 15) {
+                        const isHourMarker = minute === 0;
+                        const isPast = isPastTime(hour, minute);
+                        const timeCell = $(`<div class="time-cell ${isHourMarker ? 'hour-marker' : ''} ${isPast ? 'past-time' : ''}"
+                                                            data-time="${hour}:${minute.toString().padStart(2, '0')}"></div>`);
+                        eventGrid.append(timeCell);
+                    }
+                }
+
+                roomColumn.append(eventGrid);
+                gridContainer.append(roomColumn);
+            });
+
+            // Add meetings to the grid
+            addMeetingsToGrid();
+
+            // Add room column tooltips
+            addRoomColumnTooltips();
+
+            // Make events draggable
+            makeEventsDraggable();
+
+            // Add event tooltips for more details
+            addMeetingTooltips();
+        }
+
+        // Add meetings to the grid based on the data
+        function addMeetingsToGrid() {
+            meetingData.forEach(meeting => {
+                const [hours, minutes] = meeting.startTime.split(':').map(Number);
+
+                // Skip if outside our time range
+                if (hours < startHour || hours > endHour) {
+                    return;
+                }
+
+                // Calculate position
+                const startTimeMinutes = (hours - startHour) * 60 + minutes;
+                const topPosition = startTimeMinutes * (15 / 15); // pixels per minute
+                const height = meeting.duration * (15 / 15); // meeting.duration in minutes
+
+                // Set color based on status
+                let statusColor = 'rgba(0, 123, 255, 0.8)'; // Default blue
+                if (meeting.status === 'Confirmed') {
+                    statusColor = 'rgba(40, 167, 69, 0.8)'; // Green for confirmed
+                } else if (meeting.status === 'Cancelled') {
+                    statusColor = 'rgba(220, 53, 69, 0.8)'; // Red for cancelled
+                } else if (meeting.status === 'Requested') {
+                    statusColor = 'rgba(255, 193, 7, 0.8)'; // Yellow for requested
+                }
+
+                // Format times for tooltip
+                const startTime = meeting.startDateTime ? meeting.startDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+                const endTime = meeting.endDateTime ? meeting.endDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+                const dateStr = meeting.startDateTime ? meeting.startDateTime.toLocaleDateString() : '';
+
+                // Create the meeting event element with a tooltip
+                const meetingEvent = $(`
+                                    <div class="meeting-event draggable"
+                                         style="top: ${topPosition}px; height: ${height}px; background-color: ${statusColor};"
+                                         data-room="${meeting.room}"
+                                         data-start="${meeting.startTime}"
+                                         data-duration="${meeting.duration}"
+                                         data-id="${meeting.roomId}"
+                                         data-status="${meeting.status}">
+                                        <div class="meeting-title">${meeting.title}</div>
+                                        <div class="meeting-organizer">${meeting.organizer}</div>
+                                        ${meeting.description ? `<div class="meeting-description">${meeting.description}</div>` : ''}
+                                        <div class="meeting-tooltip">
+                                            <div class="tooltip-title">${meeting.title}</div>
+                                            <div class="tooltip-info"><strong>Ngày:</strong> ${dateStr}</div>
+                                            <div class="tooltip-info"><strong>Thời gian:</strong> ${startTime} - ${endTime}</div>
+                                            <div class="tooltip-info"><strong>Người tổ chức:</strong> ${meeting.organizer}</div>
+                                            <div class="tooltip-info"><strong>Phòng:</strong> ${meeting.roomName}</div>
+                                            <div class="tooltip-info"><strong>Vị trí:</strong> ${meeting.location}</div>
+                                            <div class="tooltip-info"><strong>Trạng thái:</strong> ${meeting.status}</div>
+                                        </div>
+                                        <div class="resizer"></div>
+                                    </div>
+                                `);
+
+                // Append to the correct room column
+                $(`.room-column[data-room="${meeting.room}"] .event-grid`).append(meetingEvent);
+            });
+        }
+
+        // Add detailed tooltips for meetings
+        function addMeetingTooltips() {
+            $('.meeting-event').hover(
+                function() { // Mouse enter
+                    const tooltip = $(this).find('.meeting-tooltip');
+
+                    // Adjust position to ensure tooltip is visible
+                    const parent = $(this).closest('.schedule-container');
+                    const parentRight = parent.offset().left + parent.width();
+                    const tooltipWidth = tooltip.outerWidth();
+
+                    // Check if tooltip would go outside container
+                    if ($(this).offset().left + $(this).outerWidth() + tooltipWidth > parentRight) {
+                        tooltip.css({
+                            left: 'auto',
+                            right: '100%'
+                        });
+                    }
+                },
+                function() { // Mouse leave
+                    // No action needed when mouse leaves
+                }
+            );
+        }
+
+        // Add room column tooltips
+        function addRoomColumnTooltips() {
+            // Create tooltips for room columns in the grid
+            $('.room-column').each(function() {
+                const roomId = $(this).data('room');
+
+                // Find the room details in meeting data
+                const roomInfo = meetingData.find(meeting => meeting.room === roomId);
+
+                if (roomInfo) {
+                    const extraInfo = roomInfo.username ? `<div class="tooltip-info"><strong>Ghi chú:</strong> ${roomInfo.username}</div>` : '';
+
+                    // Create tooltip content
+                    const tooltipContent = $(`
+                        <div class="room-tooltip">
+                          <div class="tooltip-title">Phòng ${roomInfo.roomName}</div>
+                          <div class="tooltip-info"><strong>Vị trí:</strong> ${roomInfo.location}</div>
+                          <div class="tooltip-info"><strong>Sức chứa:</strong> ${roomInfo.capacity} người</div>
+                          ${extraInfo}
+                        </div>
+                      `);
+
+                    // Create column header element
+                    const columnHeader = $(`<div class="room-column-header" data-room="${roomId}"></div>`);
+                    columnHeader.append(tooltipContent);
+
+                    // Add to the column
+                    $(this).prepend(columnHeader);
+                }
+            });
+        }
+
+        // Make events draggable and resizable
+        function makeEventsDraggable() {
+            $('.meeting-event.draggable').draggable({
+                axis: 'y',
+                grid: [15, 15],
+                containment: '.event-grid',
+                start: function(event, ui) {
+                    $(this).addClass('dragging');
+                    // Store original position for canceling if needed
+                    $(this).data('originalTop', ui.position.top);
+                },
+                drag: function(event, ui) {
+                    // Check if dragging would put the event in past time
+                    const topPosition = ui.position.top;
+                    const startMinutes = topPosition * (15 / 15);
+                    const hour = Math.floor(startMinutes / 60) + startHour;
+                    const minute = startMinutes % 60;
+
+                    if (isPastTime(hour, minute)) {
+                        // Don't allow dragging into past time
+                        ui.position.top = $(this).data('originalTop');
+                        return false;
+                    }
+                },
+                stop: function(event, ui) {
+                    $(this).removeClass('dragging');
+
+                    // Update the meeting time based on position
+                    const topPosition = ui.position.top;
+                    const startMinutes = topPosition * (15 / 15);
+                    const hour = Math.floor(startMinutes / 60) + startHour;
+                    const minute = startMinutes % 60;
+
+                    // Check if the new position is in the past
+                    if (isPastTime(hour, minute)) {
+                        // Reset to original position
+                        $(this).css('top', $(this).data('originalTop'));
+                        alert('Không thể di chuyển cuộc họp vào thời gian đã qua!');
+                        return;
+                    }
+
+                    // Format the new start time
+                    const newStartTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+
+                    // Update data attributes
+                    $(this).attr('data-start', newStartTime);
+
+                    // Get meeting ID for API update
+                    const meetingId = $(this).data('id');
+
+                    // Update the meetingData array
+                    const meetingIndex = meetingData.findIndex(m => m.roomId == meetingId);
+                    if (meetingIndex >= 0) {
+                        meetingData[meetingIndex].startTime = newStartTime;
+
+                        // Update startDateTime
+                        const startDateTime = new Date(meetingData[meetingIndex].startDateTime);
+                        startDateTime.setHours(hour, minute);
+                        meetingData[meetingIndex].startDateTime = startDateTime;
+
+                        // Update endDateTime based on duration
+                        const endDateTime = new Date(startDateTime);
+                        endDateTime.setMinutes(endDateTime.getMinutes() + meetingData[meetingIndex].duration);
+                        meetingData[meetingIndex].endDateTime = endDateTime;
+                    }
+
+                    // In a real application, this would update the server
+                    console.log(`Meeting ID: ${meetingId} moved to ${newStartTime}`);
+
+                    // Update tooltip info
+                    updateMeetingTooltip($(this), meetingIndex);
+
+                    // Example API call (commented out)
+                    // $.ajax({
+                    //     url: `${API_URL}/${meetingId}`,
+                    //     method: 'PUT',
+                    //     data: JSON.stringify({
+                    //         startTime: newStartTime,
+                    //         duration: $(this).data('duration')
+                    //     }),
+                    //     contentType: 'application/json',
+                    //     success: function(response) {
+                    //         console.log('Meeting updated successfully');
+                    //     },
+                    //     error: function(error) {
+                    //         console.error('Error updating meeting:', error);
+                    //     }
+                    // });
+                }
+            });
+
+            // Make events resizable
+            $('.meeting-event .resizer').mousedown(function(e) {
+                e.preventDefault();
+
+                const meetingEvent = $(this).parent();
+                const startY = e.clientY;
+                const startHeight = meetingEvent.height();
+                const originalHeight = startHeight;
+
+                $(document).mousemove(function(e) {
+                    const delta = e.clientY - startY;
+                    const newHeight = Math.max(15, Math.round((startHeight + delta) / 15) * 15); // Snap to 15px grid
+
+                    // Get meeting start time
+                    const [hours, minutes] = meetingEvent.data('start').split(':').map(Number);
+                    const startTimeMinutes = (hours - startHour) * 60 + minutes;
+
+                    // Calculate new end time
+                    const endTimeMinutes = startTimeMinutes + (newHeight / 15 * 15);
+                    const endHour = Math.floor(endTimeMinutes / 60) + startHour;
+                    const endMinute = endTimeMinutes % 60;
+
+                    // Check if end time would exceed working hours
+                    if (endHour > endHour || (endHour === endHour && endMinute > 0)) {
+                        return;
+                    }
+
+                    meetingEvent.height(newHeight);
+
+                    // Update duration
+                    const newDuration = newHeight * (15 / 15); // Convert back to minutes
+                    meetingEvent.attr('data-duration', newDuration);
+                });
+
+                $(document).mouseup(function() {
+                    $(document).off('mousemove');
+                    $(document).off('mouseup');
+
+                    // Get meeting ID for API update
+                    const meetingId = meetingEvent.data('id');
+                    const newDuration = parseInt(meetingEvent.attr('data-duration'));
+
+                    // Update the meetingData array
+                    const meetingIndex = meetingData.findIndex(m => m.roomId == meetingId);
+                    if (meetingIndex >= 0) {
+                        meetingData[meetingIndex].duration = newDuration;
+
+                        // Update endDateTime based on new duration
+                        const endDateTime = new Date(meetingData[meetingIndex].startDateTime);
+                        endDateTime.setMinutes(endDateTime.getMinutes() + newDuration);
+                        meetingData[meetingIndex].endDateTime = endDateTime;
+                    }
+
+                    // In a real application, this would update the server
+                    console.log(`Meeting ID: ${meetingId} resized to ${newDuration} minutes`);
+
+                    // Update tooltip info
+                    updateMeetingTooltip(meetingEvent, meetingIndex);
+
+                    // Example API call (commented out)
+                    // $.ajax({
+                    //     url: `${API_URL}/${meetingId}`,
+                    //     method: 'PUT',
+                    //     data: JSON.stringify({
+                    //         duration: newDuration
+                    //     }),
+                    //     contentType: 'application/json',
+                    //     success: function(response) {
+                    //         console.log('Meeting duration updated successfully');
+                    //     },
+                    //     error: function(error) {
+                    //         console.error('Error updating meeting duration:', error);
+                    //     }
+                    // });
+                });
+            });
+        }
+
+        // Update meeting tooltip with new information
+        function updateMeetingTooltip(meetingElement, meetingIndex) {
+            if (meetingIndex >= 0) {
+                const meeting = meetingData[meetingIndex];
+                const tooltip = meetingElement.find('.meeting-tooltip');
+
+                const startTime = meeting.startDateTime ? meeting.startDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+                const endTime = meeting.endDateTime ? meeting.endDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+                const dateStr = meeting.startDateTime ? meeting.startDateTime.toLocaleDateString() : '';
+
+                // Update tooltip content
+                tooltip.find('.tooltip-info:eq(0)').html(`<strong>Ngày:</strong> ${dateStr}`);
+                tooltip.find('.tooltip-info:eq(1)').html(`<strong>Thời gian:</strong> ${startTime} - ${endTime}`);
+            }
+        }
+
+        // Allow adding new events by clicking on empty time cells
+        /*function setupAddNewEvent() {
+          $(document).on('dblclick', '.time-cell', function() {
+            const clickedTime = $(this).data('time');
+            const roomId = $(this).closest('.room-column').data('room');
+
+            // Check if this time is in the past
+            if ($(this).hasClass('past-time')) {
+              alert('Không thể đặt phòng họp cho thời gian đã qua!');
+              return;
+            }
+
+            // Find room details
+            const room = meetingData.find(meeting => meeting.room === roomId);
+
+            if (!room) {
+              console.error(`Room ${roomId} not found in data`);
+              return;
+            }
+
+            // Validation: Check if the time slot is already booked
+            const isTimeSlotBooked = meetingData.some(meeting => {
+              if (meeting.room !== roomId) return false;
+
+              const [meetingHours, meetingMinutes] = meeting.startTime.split(':').map(Number);
+              const meetingStartMinutes = meetingHours * 60 + meetingMinutes;
+              const meetingEndMinutes = meetingStartMinutes + meeting.duration;
+
+              const [clickedHours, clickedMinutes] = clickedTime.split(':').map(Number);
+              const clickedTimeMinutes = clickedHours * 60 + clickedMinutes;
+
+              // Check if clicked time falls within this meeting's time span
+              return (clickedTimeMinutes >= meetingStartMinutes &&
+                      clickedTimeMinutes < meetingEndMinutes);
+            });
+
+            if (isTimeSlotBooked) {
+              alert('Thời gian này đã được đặt. Vui lòng chọn thời gian khác.');
+              return;
+            }
+
+            // In a real application, this would open a modal to create a new meeting
+            console.log(`New meeting at ${clickedTime} in room ${roomId} (${room.roomName})`);
+
+            // For demonstration, create a mock new meeting
+            const [hours, minutes] = clickedTime.split(':').map(Number);
+
+            // Create start and end times for the meeting
+            const startDateTime = new Date();
+            startDateTime.setHours(hours, minutes, 0);
+
+            const endDateTime = new Date(startDateTime);
+            endDateTime.setMinutes(endDateTime.getMinutes() + 30); // 30 min duration
+
+            const newMeeting = {
+              room: roomId,
+              roomId: room.roomId,
+              roomName: room.roomName,
+              location: room.location,
+              capacity: room.capacity,
+              title: `New Meeting - ${room.roomName}`,
+              organizer: 'Current User',
+              description: 'Status: Requested',
+              startTime: clickedTime,
+              duration: 30,
+              status: 'Requested',
+              startDateTime: startDateTime,
+              endDateTime: endDateTime
+            };
+
+            // Add to meetingData
+            meetingData.push(newMeeting);
+
+            // Refresh the grid
+            addMeetingsToGrid();
+            makeEventsDraggable();
+            addMeetingTooltips();
+
+            // Example API call (commented out)
+            // $.ajax({
+            //     url: API_URL,
+            //     method: 'POST',
+            //     data: JSON.stringify({
+            //         roomId: room.roomId,
+            //         startTime: clickedTime,
+            //         duration: 30,
+            //         // other required fields
+            //     }),
+            //     contentType: 'application/json',
+            //     success: function(response) {
+            //         console.log('New meeting created successfully');
+            //         // Reload data from server
+            //         fetchMeetingRooms();
+            //     },
+            //     error: function(error) {
+            //         console.error('Error creating new meeting:', error);
+            //     }
+            // });
+          });
+        }*/
+        function setupAddNewEvent() {
+            $(document).on('dblclick', '.time-cell', function() {
+                const clickedTime = $(this).data('time');
+                const roomId = $(this).closest('.room-column').data('room');
+
+                // Check if this time is in the past
+                if ($(this).hasClass('past-time')) {
+                    alert('Không thể đặt phòng họp cho thời gian đã qua!');
+                    return;
+                }
+
+                // Find room details
+                const room = meetingData.find(meeting => meeting.room === roomId);
+
+                if (!room) {
+                    console.error(`Room ${roomId} not found in data`);
+                    return;
+                }
+
+                // Validation: Check if the time slot is already booked
+                const isTimeSlotBooked = meetingData.some(meeting => {
+                    if (meeting.room !== roomId) return false;
+
+                    const [meetingHours, meetingMinutes] = meeting.startTime.split(':').map(Number);
+                    const meetingStartMinutes = meetingHours * 60 + meetingMinutes;
+                    const meetingEndMinutes = meetingStartMinutes + meeting.duration;
+
+                    const [clickedHours, clickedMinutes] = clickedTime.split(':').map(Number);
+                    const clickedTimeMinutes = clickedHours * 60 + clickedMinutes;
+
+                    // Check if clicked time falls within this meeting's time span
+                    return (clickedTimeMinutes >= meetingStartMinutes &&
+                        clickedTimeMinutes < meetingEndMinutes);
+                });
+
+                if (isTimeSlotBooked) {
+                    alert('Thời gian này đã được đặt. Vui lòng chọn thời gian khác.');
+                    return;
+                }
+
+                // Navigate to bookings.html with necessary data in the URL
+                const bookingUrl = `bookings.html?time=${encodeURIComponent(clickedTime)}&room=${encodeURIComponent(roomId)}&roomName=${encodeURIComponent(room.roomName)}&capacity=${encodeURIComponent(room.capacity)}`;
+                window.location.href = bookingUrl;
+            });
+        }
+
+
+        // Room navigation variables
+        let currentRoomIndex = 0;
+
+        // Function to update room scroll position
+        function updateRoomScrollPosition() {
+            const roomCards = $('.room-card');
+            const totalRooms = roomCards.length;
+
+            // Ensure current index is within bounds
+            if (currentRoomIndex < 0) currentRoomIndex = 0;
+            if (currentRoomIndex >= totalRooms) currentRoomIndex = totalRooms - 1;
+
+            // Calculate the scroll position based on the current room index
+            const scrollPosition = currentRoomIndex * 215; // 200px width + 15px margin
+            $('.room-list').animate({ scrollLeft: scrollPosition }, 300);
+
+            // Also scroll the grid container to show the corresponding column
+            const gridScrollPosition = currentRoomIndex * 200; // 200px column width
+            $('.schedule-container').scrollLeft(gridScrollPosition);
+
+            // Update selected room
+            roomCards.removeClass('selected-room');
+            $(roomCards[currentRoomIndex]).addClass('selected-room');
+        }
+
+        // Handle navigation arrows
+        $('.nav-left').on('click', function() {
+            if (currentRoomIndex > 0) {
+                currentRoomIndex--;
+                updateRoomScrollPosition();
+            }
+        });
+
+        $('.nav-right').on('click', function() {
+            const roomCards = $('.room-card');
+            const totalRooms = roomCards.length;
+
+            if (currentRoomIndex < totalRooms - 1) {
+                currentRoomIndex++;
+                updateRoomScrollPosition();
+            }
+        });
+
+        // Filter functionality
+        $('.btn-filter').on('click', function() {
+            // Get filter values
+            const date = $('.date-input').val();
+            const startTime = $('#startTime').val();
+            const endTime = $('#endTime').val();
+            const duration = $('.duration-input').val();
+            let capacity = $('.seats-input').val();
+
+            // Extract number from capacity
+            if (capacity && capacity !== 'Capacti') {
+                capacity = capacity.replace(/[^0-9]/g, '');
+            } else {
+                capacity = null;
+            }
+
+            const location = $('.location-input').val() !== '789 tower' ? $('.location-input').val() : null;
+            const roomName = $('.search-input').val() || null;
+
+            // Create filter object
+            const filters = {
+                date: date,
+                startTime: startTime,
+                endTime: endTime,
+                duration: duration !== 'Duration' ? duration : null,
+                capacity: capacity,
+                location: location,
+                roomName: roomName
+            };
+
+            // Fetch filtered data
+            fetchMeetingRooms(filters);
+        });
+
+        // Reset filter
+        $('.btn-reset').on('click', function() {
+            // Reset all filter inputs
+            $('.filter-input').val('');
+            $('select.filter-input').prop('selectedIndex', 0);
+            $('.date-input').val(formattedDate);
+
+            // Fetch all data
+            fetchMeetingRooms();
+        });
+
+        // Initialize the grid and events
+        setupAddNewEvent();
+    });
+</script>
+</body>
+</html>

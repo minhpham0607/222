@@ -1,0 +1,8 @@
+spring:
+    profiles:
+        active: "loc"
+    application:
+        name: HRMS
+
+server:
+    port: 8080
