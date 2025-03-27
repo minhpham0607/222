@@ -21,10 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Tag(name = "API requests")
 @RestController
@@ -61,6 +58,7 @@ public class RequestRestController {
             @ApiResponse(responseCode = "400", description = "Invalid request data"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
+
     @PostMapping("/create")
     public ResponseEntity<?> createRequest(@RequestBody RequestDto.Req requestDto, @RequestParam String username) {
         boolean success = requestService.createRequest(username, requestDto);
@@ -70,6 +68,18 @@ public class RequestRestController {
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Request created successfully", "username", username));
+    }
+    @Operation(summary = "Get total leave days of a user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved total leave days",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Long.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Invalid request",
+                    content = @Content)})
+    @GetMapping("/days-off")
+    public long getTotalLeaveDays(@RequestParam String username) {
+        return requestService.getTotalLeaveDays(username);
     }
     @PutMapping("/{id}")
     public ResponseEntity<String> updateRequest(@PathVariable Long id, @RequestBody Request request) {
@@ -81,4 +91,6 @@ public class RequestRestController {
             return ResponseEntity.status(404).body("Request not found.");
         }
     }
+
+
 }

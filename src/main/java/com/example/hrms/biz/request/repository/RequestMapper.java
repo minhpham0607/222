@@ -2,6 +2,7 @@ package com.example.hrms.biz.request.repository;
 
 import com.example.hrms.biz.request.model.Request;
 import com.example.hrms.biz.request.model.criteria.RequestCriteria;
+import com.example.hrms.biz.request.model.dto.RequestDto;
 import com.example.hrms.enumation.RequestStatusEnum;
 import com.example.hrms.enumation.RequestTypeEnum;
 import org.apache.ibatis.annotations.*;
@@ -54,19 +55,26 @@ public interface RequestMapper {
             "ORDER BY " +
             "    r.request_id ASC " +
             "LIMIT #{pageSize} OFFSET #{offset}")
-            List<Request> select(@Param("pageSize") int pageSize,
-                                 @Param("offset") int offset,
-                                 @Param("requestId") Long requestId,
-                                 @Param("username") String username,
-                                 @Param("departmentId") Long departmentId,
-                                 @Param("requestType") RequestTypeEnum requestType,
-                                 @Param("requestReason") String requestReason,
-                                 @Param("requestStatus") RequestStatusEnum requestStatus,
-                                 @Param("approverUsername") String approverUsername,
-                                 @Param("startTime") Date startTime,
-                                 @Param("endTime") Date endTime);
+    List<Request> select(@Param("pageSize") int pageSize,
+                         @Param("offset") int offset,
+                         @Param("requestId") Long requestId,
+                         @Param("username") String username,
+                         @Param("departmentId") Long departmentId,
+                         @Param("requestType") RequestTypeEnum requestType,
+                         @Param("requestReason") String requestReason,
+                         @Param("requestStatus") RequestStatusEnum requestStatus,
+                         @Param("approverUsername") String approverUsername,
+                         @Param("startTime") Date startTime,
+                         @Param("endTime") Date endTime);
+    @Select("SELECT COALESCE(SUM(DATEDIFF(end_time, start_time) + 1), 0) " +
+            "FROM requests " +
+            "WHERE request_status = 'APPROVED' " +
+            "AND request_type IN ('PAID_LEAVE') " +
+            "AND username = #{username}")
+    Integer calculateTotalLeaveDays(@Param("username") String username);
+
     @Insert("INSERT INTO Requests (username, department_id, request_type, request_reason, request_status, approver_username, start_time, end_time) " +
-            "VALUES (#{username}, #{departmentId}, #{requestType}, #{requestReason}, #{requestStatus}, #{approverUsername}, #{startTime}, #{endTime})")
+            "VALUES (#{username}, #{departmentId}, #{requestType}, #{requestReason}, COALESCE(#{requestStatus}, 'PENDING'), #{approverUsername}, #{startTime}, #{endTime})")
     @Options(useGeneratedKeys = true, keyProperty = "requestId")
     void insertRequest(Request request);
 
@@ -76,7 +84,10 @@ public interface RequestMapper {
     @Select("SELECT approver_username FROM Requests WHERE department_id = #{departmentId} " +
             "ORDER BY created_at DESC LIMIT 1")
     String findLatestApproverByDepartment(@Param("departmentId") Long departmentId);
+
     @Update("UPDATE Requests SET request_type = #{requestType}, request_reason = #{requestReason}, " +
             "start_time = #{startTime}, end_time = #{endTime}, updated_at = CURRENT_TIMESTAMP " +
             "WHERE request_id = #{requestId} AND request_status = 'PENDING'")
-    int updateRequest(Request request);}
+    int updateRequest(Request request);
+
+}

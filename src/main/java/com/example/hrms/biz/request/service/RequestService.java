@@ -8,6 +8,7 @@ import com.example.hrms.common.http.criteria.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -46,6 +47,12 @@ public class RequestService {
             log.error("Error fetching request list", e);
             throw new RuntimeException("Could not fetch request list, please try again later.");
         }
+    }
+    public int getTotalLeaveDays(String username) {
+        log.info("Fetching total leave days for user: {}", username);
+        Integer totalDays = requestMapper.calculateTotalLeaveDays(username);
+        log.info("Total leave days for {}: {}", username, totalDays);
+        return totalDays != null ? totalDays : 0;
     }
     public boolean createRequest(String username, RequestDto.Req requestDto) {
         Long departmentId = requestMapper.findDepartmentByUsername(username);

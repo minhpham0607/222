@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>Quản lý Yêu Cầu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            background: white;
+        }
+        .logout-button {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            margin-left: auto;
+            font-size: 14px;
+            border: none;
+            background: none;
+        }
+        .logout-button i {
+            font-size: 24px;
+        }
+        h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #312c2c;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .filter-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .filter-box input, .filter-box select, .filter-box button {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .filter-box button {
+            background-color: #ecd5d5;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .filter-box button:hover {
+            background-color: #FFFFFF;
+        }
+        .create-button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .create-button:hover {
+            background-color: #218838;
+        }
+    </style>
+    <script>
+        const API_BASE_URL = "http://localhost:8080/api/v1/requests";
+        const currentUsername = localStorage.getItem("username") || "ntdu";
+
+        async function fetchRequests() {
+            try {
+                const response = await fetch(`${API_BASE_URL}?username=${currentUsername}`);
+                if (!response.ok) throw new Error(`Lỗi HTTP! Mã lỗi: ${response.status}`);
+                const data = await response.json();
+                if (!data || !data.data || !Array.isArray(data.data)) throw new Error("Dữ liệu API không hợp lệ");
+
+                const filteredData = data.data.filter(request => request.username === currentUsername);
+                populateTable(filteredData);
+            } catch (error) {
+                console.error("Lỗi:", error);
+                document.getElementById("requestsTableBody").innerHTML =
+                    `<tr><td colspan="8" style="text-align:center; color: red;">Lỗi khi tải dữ liệu.</td></tr>`;
+            }
+        }
+
+        function populateTable(data) {
+            const tableBody = document.getElementById("requestsTableBody");
+            tableBody.innerHTML = "";
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;">Không có dữ liệu</td></tr>`;
+                return;
+            }
+
+            data.forEach(request => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = formatRequestType(request.requestType);
+                row.insertCell(1).textContent = request.username || "-";
+                row.insertCell(2).textContent = formatDate(request.createdAt);
+                row.insertCell(3).textContent = formatDuration(request.startTime, request.endTime);
+                row.insertCell(4).textContent = request.requestReason || "-";
+                row.insertCell(5).textContent = request.approverUsername || "Chưa có";
+                row.insertCell(6).textContent = formatRequestStatus(request.requestStatus);
+
+
+
+                const editCell = row.insertCell(7);
+                const editButton = document.createElement("button");
+                editButton.innerHTML = '<i class="fas fa-edit"></i>';
+                editButton.onclick = () => editRequest(request);
+                editCell.appendChild(editButton);
+
+            });
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return "-";
+            const date = new Date(dateString);
+            return date.toISOString().split("T")[0]; // Trả về YYYY-MM-DD
+        }
+        function formatDuration(start, end) {
+            if (!start || !end) return "-";
+            const startDate = new Date(start).toISOString().split("T")[0]; // YYYY-MM-DD
+            const endDate = new Date(end).toISOString().split("T")[0]; // YYYY-MM-DD
+            return startDate === endDate ? startDate : `${startDate} - ${endDate}`;
+        }
+
+        function formatRequestType(type) {
+            return {
+                "UNPAID_LEAVE": "Nghỉ không lương",
+                "PAID_LEAVE": "Nghỉ có lương",
+            }[type] || "-";
+        }
+
+        function formatRequestStatus(status) {
+            return {
+                "APPROVED": "Đã duyệt",
+                "REJECTED": "Từ chối",
+                "PENDING": "Chờ duyệt"
+            }[status] || "-";
+        }
+        function filterRequests() {
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
+            // Kiểm tra nếu ngày bắt đầu lớn hơn ngày kết thúc
+            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+                alert("Ngày bắt đầu không được lớn hơn ngày kết thúc.");
+                return;
+            }
+            const requestType = document.getElementById("requestType").value;
+            const requestStatus = document.getElementById("requestStatus").value;
+            const requestReason = document.getElementById("requestReason").value.toLowerCase();
+            document.querySelectorAll("#requestsTableBody tr").forEach(row => {
+                const [type, , date, , reason, , status] = [...row.cells].map(cell => cell.textContent.trim());
+                let show = true;
+                if (startDate && new Date(date) < new Date(startDate)) show = false;
+                if (endDate && new Date(date) > new Date(endDate)) show = false;
+                if (requestType && type !== formatRequestType(requestType)) show = false;
+                if (requestStatus && status !== formatRequestStatus(requestStatus)) show = false;
+                if (requestReason && !reason.toLowerCase().includes(requestReason)) show = false;
+                row.style.display = show ? "" : "none";
+            });
+        }
+        function resetFilters() {
+            document.getElementById("startDate").value = "";
+            document.getElementById("endDate").value = "";
+            document.getElementById("requestType").value = "";
+            document.getElementById("requestStatus").value = "";
+            document.getElementById("requestReason").value = "";
+            fetchRequests(); // Tải lại danh sách yêu cầu
+        }
+
+        function editRequest(request) {
+            localStorage.setItem("editRequestData", JSON.stringify(request));
+            window.location.href = `edit_request.html?id=${request.requestId}`;
+        }
+
+        window.onload = fetchRequests;
+    </script>
+</head>
+<body>
+<div class="container">
+    <button class="logout-button" onclick="alert('Đăng xuất!')">
+        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+    </button>
+
+    <button class="create-button" onclick="window.location.href='create1.html'">+ Tạo mới</button>
+
+    <div class="filter-box">
+        <label>Ngày bắt đầu: <input type="date" id="startDate"></label>
+        <label>Ngày kết thúc: <input type="date" id="endDate"></label>
+        <label>Kiểu yêu cầu:
+            <select id="requestType">
+                <option value="">Tất cả</option>
+                <option value="UNPAID_LEAVE">Nghỉ không lương</option>
+                <option value="PAID_LEAVE">Nghỉ có lương</option>
+            </select>
+        </label>
+        <label>Trạng thái:
+            <select id="requestStatus">
+                <option value="">Tất cả</option>
+                <option value="APPROVED">Đã duyệt</option>
+                <option value="REJECTED">Từ chối</option>
+                <option value="PENDING">Chờ duyệt</option>
+            </select>
+        </label>
+        <label>Lý do: <input type="text" id="requestReason"></label>
+        <i onclick="filterRequests()" class="fa-solid fa-magnifying-glass"></i>
+        <i onclick="resetFilters()" class="fa-solid fa-rotate-right"></i>
+        <button>Thêm mới</button>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>Kiểu yêu cầu</th>
+            <th>Người yêu cầu</th>
+            <th>Ngày tạo</th>
+            <th>Khoảng thời gian</th>
+            <th>Lý do</th>
+            <th>Người duyệt</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+
+        </tr>
+        </thead>
+        <tbody id="requestsTableBody"></tbody>
+    </table>
+</div>
+</body>
+</html>
